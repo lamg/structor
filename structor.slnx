@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="GolangParserCs/GolangParserCs.csproj" />
+  <Project Path="structor/structor.fsproj" />
+</Solution>
