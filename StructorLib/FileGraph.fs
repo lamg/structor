@@ -1,4 +1,4 @@
-module structor.FileGraph
+module Structor.FileGraph
 
 open System
 open FSharp.Compiler.CodeAnalysis
@@ -129,7 +129,7 @@ let visitModulesAndNamespaces modulesOrNss =
 
   graph
 
-let exportToGraphviz (graph: AdjacencyGraph<string, Edge<string>>, outputFile: string) =
+let exportToGraphviz (graph: AdjacencyGraph<string, Edge<string>>) =
   let random = Random()
   let existingColors = []
 
@@ -176,10 +176,9 @@ let exportToGraphviz (graph: AdjacencyGraph<string, Edge<string>>, outputFile: s
   graphviz.CommonEdgeFormat.StrokeColor <- GraphvizColor.Azure
   
   graphviz.GraphFormat.BackgroundColor <- GraphvizColor(255uy, 46uy, 46uy, 46uy)
-  let res = graphviz.Generate()
-  IO.File.WriteAllText(outputFile, res)
+  graphviz.Generate()
 
-let visitSource (sourcePath: string) (dest:string) =
+let visitSource (sourcePath: string) =
   let input = IO.File.ReadAllText sourcePath
   let tree = getUntypedTree (sourcePath, SourceText.ofString input)
 
@@ -187,5 +186,5 @@ let visitSource (sourcePath: string) (dest:string) =
   | ParsedInput.ImplFile(implFile) ->
     let (ParsedImplFileInput(contents = modules)) = implFile
     let graph = visitModulesAndNamespaces modules
-    exportToGraphviz (graph, dest)
+    exportToGraphviz graph
   | _ -> failwith "F# Interface file (*.fsi) not supported."

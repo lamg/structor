@@ -1,12 +1,41 @@
-﻿open structor
-// This attribute is required and needs to match the correct context type!
+﻿open System
+open Structor
+open Argu
+
+type Args =
+  | [<AltCommandLine("-s")>] Source of string
+  | [<AltCommandLine("-o")>] Output of string
+
+  interface IArgParserTemplate with
+    member s.Usage =
+      match s with
+      | Source _ -> "Path to the file to be inspected"
+      | Output _ -> "Output file for the Graphviz graph"
 
 [<EntryPoint>]
 let main args =
-  match args with
-  | [| source; dest |] ->
-    FileGraph.visitSource source dest
+  let errorHandler =
+    ProcessExiter(
+      colorizer =
+        function
+        | ErrorCode.HelpText -> None
+        | _ -> Some ConsoleColor.Red
+    )
+
+  let parser =
+    ArgumentParser.Create<Args>(programName = "structor", errorHandler = errorHandler)
+
+  let results = parser.ParseCommandLine(inputs = args, raiseOnUsage = true)
+
+  match results.TryGetResult Source, results.TryGetResult Output with
+  | Some src, None ->
+    let res = FileGraph.visitSource src
+    printfn $"{res}"
+    0
+  | Some src, Some dest ->
+    let res = FileGraph.visitSource src
+    IO.File.WriteAllText(dest, res)
     0
   | _ ->
-    eprintfn $"unrecognized arguments {args}"
+    eprintfn $"{parser.PrintUsage()}"
     1

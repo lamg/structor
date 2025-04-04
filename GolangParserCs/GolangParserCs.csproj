@@ -1,13 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
-        <TargetFramework>net9.0</TargetFramework>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <Nullable>enable</Nullable>
-    </PropertyGroup>
-  
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
   <ItemGroup>
-    
+
     <Antlr4 Include="GoLexer.g4">
       <Listener>false</Listener>
       <Visitor>false</Visitor>
@@ -15,7 +15,7 @@
       <Package>GolangParserCs</Package>
       <Error>true</Error>
     </Antlr4>
-    
+
     <Antlr4 Include="GoParser.g4">
       <Listener>false</Listener>
       <Visitor>true</Visitor>
@@ -25,9 +25,9 @@
     </Antlr4>
   </ItemGroup>
 
-  <ItemGroup> 
-    <PackageReference Include="Antlr4.Runtime.Standard"  Version="4.10.1"/>
-    <PackageReference Include="Antlr4BuildTasks" Version="10.7"/>
+  <ItemGroup>
+    <PackageReference Include="Antlr4.Runtime.Standard"/>
+    <PackageReference Include="Antlr4BuildTasks"/>
   </ItemGroup>
-  
+
 </Project>
