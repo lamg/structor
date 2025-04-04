@@ -104,7 +104,7 @@ let visitDeclarations
 
       bindings
       |> List.iter (fun b ->
-        let (SynBinding(headPat = pat; expr = body)) = b
+        let SynBinding(headPat = pat; expr = body) = b
         let name = visitPattern pat
         let calls = visitExpression body
 
@@ -112,7 +112,7 @@ let visitDeclarations
         |> Seq.filter (fun c -> exclude |> List.exists c.StartsWith |> not && toInclude |> List.contains c)
         |> Seq.iter (fun c -> graph.AddVerticesAndEdge(Edge(name, c)) |> ignore))
 
-    | SynModuleDecl.Open(SynOpenDeclTarget.ModuleOrNamespace(SynLongIdent.SynLongIdent(idents, _, _), _), _) ->
+    | SynModuleDecl.Open(SynOpenDeclTarget.ModuleOrNamespace(SynLongIdent(idents, _, _), _), _) ->
       printfn $"open {idents}"
     | _ -> ()
 
