@@ -1,5 +1,6 @@
 <Solution>
-  <Project Path="GolangParserCs/GolangParserCs.csproj" />
-  <Project Path="structor/structor.fsproj" />
+  <Project Path="GolangParserCs\GolangParserCs.csproj" Type="Classic C#" />
+  <Project Path="RustParserCs\RustParserCs.csproj" Type="Classic C#" />
+  <Project Path="structor\structor.fsproj" Type="Classic F#" />
   <Project Path="StructorLib\StructorLib.fsproj" Type="Classic F#" />
 </Solution>

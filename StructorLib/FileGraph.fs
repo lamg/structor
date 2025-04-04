@@ -61,8 +61,6 @@ let rec visitExpression e =
       yield! visitExpression whileExpr
       yield! visitExpression synExpr
     | SynExpr.Match(_, synExpr, _, _, _) -> yield! visitExpression synExpr
-
-    // synMatchClauses |> List.iter (fun m -> visitExpression m)
     | SynExpr.ArrayOrListComputed(_, synExpr, _) -> yield! visitExpression synExpr
     | SynExpr.Sequential(_, _, synExpr, expr2, _, _) ->
       yield! visitExpression synExpr
