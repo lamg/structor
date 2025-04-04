@@ -29,11 +29,11 @@ let main args =
 
   match results.TryGetResult Source, results.TryGetResult Output with
   | Some src, None ->
-    let res = FileGraph.visitSource src
+    let res = FileGraphFs.visitSource src
     printfn $"{res}"
     0
   | Some src, Some dest ->
-    let res = FileGraph.visitSource src
+    let res = FileGraphFs.visitSource src
     IO.File.WriteAllText(dest, res)
     0
   | _ ->

@@ -1,4 +1,4 @@
-module Structor.FileGraph
+module Structor.FileGraphFs
 
 open System
 open FSharp.Compiler.CodeAnalysis
