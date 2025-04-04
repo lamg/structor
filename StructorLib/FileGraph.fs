@@ -5,7 +5,6 @@ open FSharp.Compiler.CodeAnalysis
 open FSharp.Compiler.Text
 open FSharp.Compiler.Syntax
 open QuikGraph
-open QuikGraph.Algorithms.Condensation
 open QuikGraph.Graphviz
 open QuikGraph.Graphviz.Dot
 
@@ -18,7 +17,7 @@ let getUntypedTree (file, input) =
     |> Async.RunSynchronously
 
   let parsingOptions, _errors =
-    checker.GetParsingOptionsFromProjectOptions(projOptions)
+    checker.GetParsingOptionsFromProjectOptions projOptions
 
   let parseFileResults =
     checker.ParseFile(file, input, parsingOptions) |> Async.RunSynchronously
@@ -30,7 +29,7 @@ let rec visitPattern pat =
   | SynPat.LongIdent(longDotId = SynLongIdent(id = ident)) ->
     let names = String.concat "." [ for i in ident -> i.idText ]
     names
-  | SynPat.Named(SynIdent.SynIdent(ident, _), _, _, _) -> ident.idText
+  | SynPat.Named(SynIdent(ident, _), _, _, _) -> ident.idText
   | _ -> failwith $"expecting something, got {pat}"
 
 let rec visitExpression e =
@@ -46,7 +45,7 @@ let rec visitExpression e =
     | SynExpr.ComputationExpr(_, expr, _) -> yield! visitExpression expr
     | SynExpr.LetOrUse(_, _, bindings, body, _, _) ->
       for binding in bindings do
-        let (SynBinding(headPat = pat; expr = init)) = binding
+        let SynBinding(headPat = pat; expr = init) = binding
         yield visitPattern pat
         yield! visitExpression init
         yield! visitExpression body
@@ -92,7 +91,7 @@ let visitDeclarations
       | SynModuleDecl.Let(_, bindings, _) ->
         bindings
         |> List.map (fun b ->
-          let (SynBinding(headPat = pat)) = b
+          let SynBinding(headPat = pat) = b
           visitPattern pat)
 
       | _ -> [])
@@ -123,7 +122,7 @@ let visitModulesAndNamespaces modulesOrNss =
   let graph = AdjacencyGraph<string, Edge<string>>()
 
   for moduleOrNs in modulesOrNss do
-    let (SynModuleOrNamespace(longId = lid; decls = decls)) = moduleOrNs
+    let SynModuleOrNamespace(longId = lid; decls = decls) = moduleOrNs
     printfn $"Namespace or module: %A{lid}"
     visitDeclarations graph [ "List."; "op_PipeRight"; "Option."; "Result."; "Seq." ] [] decls
 
@@ -165,6 +164,7 @@ let exportToGraphviz (graph: AdjacencyGraph<string, Edge<string>>) =
   graphviz.FormatVertex.Add(fun args ->
     args.VertexFormat.Label <- args.Vertex
     args.VertexFormat.FillColor <- randomColor ())
+
   graphviz.CommonVertexFormat.Style <- GraphvizVertexStyle.Filled
   graphviz.CommonVertexFormat.Shape <- GraphvizVertexShape.Box
   graphviz.CommonVertexFormat.FontColor <- GraphvizColor.WhiteSmoke
@@ -172,9 +172,9 @@ let exportToGraphviz (graph: AdjacencyGraph<string, Edge<string>>) =
   graphviz.CommonEdgeFormat.PenWidth <- 1.5
   graphviz.CommonEdgeFormat.StrokeColor <- GraphvizColor.LightGray
   graphviz.CommonEdgeFormat.Font <- GraphvizFont("Helvetica", 10f)
-  graphviz.CommonEdgeFormat.HeadArrow <- GraphvizArrow( GraphvizArrowShape.Vee)
+  graphviz.CommonEdgeFormat.HeadArrow <- GraphvizArrow GraphvizArrowShape.Vee
   graphviz.CommonEdgeFormat.StrokeColor <- GraphvizColor.Azure
-  
+
   graphviz.GraphFormat.BackgroundColor <- GraphvizColor(255uy, 46uy, 46uy, 46uy)
   graphviz.Generate()
 
@@ -183,8 +183,8 @@ let visitSource (sourcePath: string) =
   let tree = getUntypedTree (sourcePath, SourceText.ofString input)
 
   match tree with
-  | ParsedInput.ImplFile(implFile) ->
-    let (ParsedImplFileInput(contents = modules)) = implFile
+  | ParsedInput.ImplFile implFile ->
+    let ParsedImplFileInput(contents = modules) = implFile
     let graph = visitModulesAndNamespaces modules
     exportToGraphviz graph
   | _ -> failwith "F# Interface file (*.fsi) not supported."
